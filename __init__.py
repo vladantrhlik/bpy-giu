@@ -1,17 +1,5 @@
 import bpy
 import mathutils
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTIBILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class GIHiderOperator(bpy.types.Operator):
     bl_idname = "object.gihider"
@@ -101,7 +89,7 @@ def generate_group_input_sockets(scene, context):
     tree = context.space_data.edit_tree
     for a in tree.interface.items_tree:
         # skip panels
-        if type(a) is bpy.types.NodeTreeInterfacePanel: continue
+        if type(a) is bpy.types.NodeTreeInterfacePanel or a.in_out == "OUTPUT": continue
         name = a.name
         if len(a.parent.name) > 0:
             name = f"{a.parent.name} > {name}"
@@ -111,7 +99,7 @@ def generate_group_input_sockets(scene, context):
         opts.append((value, name, ""))
     return opts
 
-class GIFindPopup(bpy.types.Operator):
+class GIFindOperator(bpy.types.Operator):
     bl_idname = "object.gifind"
     bl_label = "GIFind"
     bl_property = "my_enum"
@@ -140,12 +128,12 @@ class GIFindPopup(bpy.types.Operator):
         wm.invoke_search_popup(self)
         return {'FINISHED'}
 
+ops = [GIHiderOperator, GIMergeOperator, GIFindOperator]
+
 def register():
-    bpy.utils.register_class(GIHiderOperator)
-    bpy.utils.register_class(GIMergeOperator)
-    bpy.utils.register_class(GIFindPopup)
+    for c in ops:
+        bpy.utils.register_class(c)
 
 def unregister():
-    bpy.utils.unregister_class(GIHiderOperator)
-    bpy.utils.unregister_class(GIMergeOperator)
-    bpy.utils.unregister_class(GIFindPopup)
+    for c in ops:
+        bpy.utils.unregister_class(c)
