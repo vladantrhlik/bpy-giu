@@ -95,73 +95,57 @@ class GIMergeOperator(bpy.types.Operator):
         self.report({'INFO'}, f"{len(nodes)} Group Inputs merged, {count} connections reconnected.")
         return {"FINISHED"}
 
-class GISocketItem(bpy.types.PropertyGroup):
-    name: bpy.props.StringProperty(name="Test Property", default="Unknown")
-    value: bpy.props.StringProperty(name="Socket Name", default="Unknown Socket")
 
-class GIFindOperator(bpy.types.Operator):
+def generate_group_input_sockets(scene, context):
+    opts = []
+    tree = context.space_data.edit_tree
+    for a in tree.interface.items_tree:
+        # skip panels
+        if type(a) is bpy.types.NodeTreeInterfacePanel: continue
+        name = a.name
+        if len(a.parent.name) > 0:
+            name = f"{a.parent.name} > {name}"
+
+        value = a.identifier
+        name = name
+        opts.append((value, name, ""))
+    return opts
+
+class GIFindPopup(bpy.types.Operator):
     bl_idname = "object.gifind"
     bl_label = "GIFind"
+    bl_property = "my_enum"
+
+    my_enum: bpy.props.EnumProperty(name="Sockets", description="", items=generate_group_input_sockets)
+
     @classmethod
     def poll(cls, context):
         return context.area.type == 'NODE_EDITOR'
 
     def execute(self, context):
+        # get active node group input
         nodes = context.selected_nodes
         node = context.active_node
 
-        if node not in nodes:
-            print("no node selected")
+        if node not in nodes or not type(node) is bpy.types.NodeGroupInput:
+            self.report({'ERROR'}, "No group input selected")
             return {"CANCELLED"}
+        
+        node.outputs[self.my_enum].hide = False
 
-        opts = bpy.context.scene.gi_search_opt
-        opts.clear()
+        return {'FINISHED'}
 
-        # fill options with sockets
-        tree = context.space_data.edit_tree
-        for a in tree.interface.items_tree:
-            # skip panels
-            if type(a) is bpy.types.NodeTreeInterfacePanel: continue
-            name = a.name
-            if len(a.parent.name) > 0:
-                name = f"{a.parent.name} > {name}"
-
-            o = opts.add()
-            o.value = a.identifier
-            o.name = name
-
-        bpy.ops.wm.call_menu(name='GIFindMenu')
-        return {"FINISHED"}
-
-class GIFindMenu(bpy.types.Menu):
-    bl_label = "GIFind"
-
-    def draw(self, context):
-        layout = self.layout
-        #layout.template_search(context.scene,"gi_opt",context.scene,"gi_search_opt")
-        layout.prop_search(context.scene,"gi_opt",context.scene,"gi_search_opt", results_are_suggestions=True)
+    def invoke(self, context, event):
+        wm = context.window_manager
+        wm.invoke_search_popup(self)
+        return {'FINISHED'}
 
 def register():
     bpy.utils.register_class(GIHiderOperator)
     bpy.utils.register_class(GIMergeOperator)
-
-    bpy.utils.register_class(GISocketItem)
-
-    bpy.utils.register_class(GIFindMenu)
-    bpy.utils.register_class(GIFindOperator)
-
-    bpy.types.Scene.gi_search_opt = bpy.props.CollectionProperty(type=GISocketItem)
-    bpy.types.Scene.gi_opt = bpy.props.PointerProperty(type=GISocketItem)
-
+    bpy.utils.register_class(GIFindPopup)
 
 def unregister():
     bpy.utils.unregister_class(GIHiderOperator)
     bpy.utils.unregister_class(GIMergeOperator)
-
-    bpy.utils.unregister_class(GISocketItem)
-
-    bpy.utils.unregister_class(GIFindMenu)
-    bpy.utils.unregister_class(GIFindOperator)
-
-    del bpy.types.Scene.gi_search_opt
-    del bpy.types.Scene.gi_opt
+    bpy.utils.unregister_class(GIFindPopup)
