@@ -6,6 +6,10 @@ class GIHideOperator(bpy.types.Operator):
     bl_label = "GIHider"
 
     @classmethod
+    def description(cls, context, properties):
+        return "Hide all unused sockets of group inputs in current node tree"
+
+    @classmethod
     def poll(cls, context):
         return context.area.type == 'NODE_EDITOR'
 
@@ -36,6 +40,10 @@ class GIHideOperator(bpy.types.Operator):
 class GIMergeOperator(bpy.types.Operator):
     bl_idname = "object.gimerge"
     bl_label = "GIMerge"
+
+    @classmethod
+    def description(cls, context, properties):
+        return "Merge 2 or more selected group inputs into one"
 
     @classmethod
     def get_selected_gis(cls, context):
@@ -109,6 +117,10 @@ class GIFindOperator(bpy.types.Operator):
     bl_property = "my_enum"
 
     my_enum: bpy.props.EnumProperty(name="Sockets", description="", items=generate_group_input_sockets)
+
+    @classmethod
+    def description(cls, context, properties):
+        return "Unhide input socket in selected group input using search menu"
 
     @classmethod
     def get_selected_gi(cls, context):
