@@ -152,3 +152,49 @@ class GIFindOperator(bpy.types.Operator):
         wm = context.window_manager
         wm.invoke_search_popup(self)
         return {'FINISHED'}
+
+
+class GIUsageOperator(bpy.types.Operator):
+    bl_idname = "object.giusage"
+    bl_label = "GIUsage"
+    bl_property = "my_enum2"
+
+    my_enum2: bpy.props.EnumProperty(name="Usages", description="", items=generate_group_input_sockets)
+
+    @classmethod
+    def description(cls, context, properties):
+        return "Find usage of group input socket"
+
+    @classmethod
+    def poll(cls, context):
+        return context.area.type == 'NODE_EDITOR'
+
+    def execute(self, context):
+        links = []
+
+        # try loading node tree
+        try: 
+            tree = context.space_data.edit_tree
+            links = tree.links
+        except:
+            self.report({'ERROR'}, "Unable to find node tree.")
+            return {'CANCELLED'}
+        
+        group_inputs = []
+        link_count = 0
+
+        for l in links:
+            if type(l.from_node) is bpy.types.NodeGroupInput and l.from_socket.identifier == self.my_enum2:
+                link_count += 1
+                if not l.from_node in group_inputs:
+                    group_inputs.append(l.from_node)
+        
+        #print(f"Socket used in {link_count} links going from {len(group_inputs)} group inputs.")
+        self.report({'INFO'}, f"Socket used in {link_count} links going from {len(group_inputs)} group inputs.")
+
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        wm.invoke_search_popup(self)
+        return {'FINISHED'}

@@ -2,7 +2,7 @@ import bpy
 from .operators import *
 from .menu import *
 
-ops = [GIHideOperator, GIMergeOperator, GIFindOperator, GIMenu, GIOpenMenu]
+ops = [GIHideOperator, GIMergeOperator, GIFindOperator, GIUsageOperator, GIMenu, GIOpenMenu]
 addon_keymaps = []
 
 def register():
@@ -14,7 +14,7 @@ def register():
     kc = wm.keyconfigs.addon
     if kc:
         km = wm.keyconfigs.addon.keymaps.new(name='Node Editor', space_type='NODE_EDITOR')
-        kmi = km.keymap_items.new(GIOpenMenu.bl_idname, type='G', value='PRESS', ctrl=True)
+        kmi = km.keymap_items.new(GIOpenMenu.bl_idname, type='G', value='PRESS', alt=True)
         addon_keymaps.append((km, kmi))
 
 def unregister():
