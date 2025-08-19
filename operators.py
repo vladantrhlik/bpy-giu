@@ -217,7 +217,7 @@ class GISeparate(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.area.type == 'NODE_EDITOR' and len(context.selected_nodes) == 1
+        return context.area.type == 'NODE_EDITOR' and GIFindOperator.get_selected_gi(context) != None
 
     def draw(self, context):
         layout = self.layout
@@ -249,6 +249,7 @@ class GISeparate(bpy.types.Operator):
                 # create new link and delete old
                 links.remove(original_link)
                 links.new(fr, to)
+                print(f"adding link between {fr} and {to}")
         
         return {'FINISHED'}
 
