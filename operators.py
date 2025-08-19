@@ -198,3 +198,85 @@ class GIUsageOperator(bpy.types.Operator):
         wm = context.window_manager
         wm.invoke_search_popup(self)
         return {'FINISHED'}
+
+
+class SocketOption(bpy.types.PropertyGroup):
+    name: bpy.props.StringProperty(name="", default="")
+    checked: bpy.props.BoolProperty(name="", default=True)
+
+class GISeparate(bpy.types.Operator):
+    bl_idname = "object.giseparate"
+    bl_label = "GISeparate"
+
+    opts: bpy.props.CollectionProperty(type=SocketOption)
+    opt_links = []
+
+    @classmethod
+    def description(cls, context, properties):
+        return "Separate selected sockets from selected Group Input"
+
+    @classmethod
+    def poll(cls, context):
+        return context.area.type == 'NODE_EDITOR' and len(context.selected_nodes) == 1
+
+    def draw(self, context):
+        layout = self.layout
+
+        for prop in self.opts:
+            layout.row().prop(prop, "checked", text=prop.name)
+
+    def execute(self, context):
+        # load node tree
+        try: 
+            gi = context.selected_nodes[0]
+            tree = context.space_data.edit_tree
+            links = tree.links
+        except:
+            self.report({'ERROR'}, "Unable to find node tree.")
+            return {'CANCELLED'}
+
+        # create new separated group input
+        new_gi = tree.nodes.new('NodeGroupInput')
+        new_gi.location = (gi.location[0], gi.location[1] + 20 + gi.height)
+
+        # reconnect selected links
+        for i, opt in enumerate(self.opts):
+            if opt.checked:
+                original_link = self.opt_links[i]
+                # figure out sockets
+                fr = new_gi.outputs[original_link.from_socket.identifier]
+                to = original_link.to_socket
+                # create new link and delete old
+                links.remove(original_link)
+                links.new(fr, to)
+        
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        self.opts.clear()
+
+        # load tree 
+        try: 
+            gi = context.selected_nodes[0]
+            tree = context.space_data.edit_tree
+            links = tree.links
+        except:
+            self.report({'ERROR'}, "Unable to find node tree.")
+            return {'CANCELLED'}
+
+        # fill opt_links width sockets coming from selected group input 
+        self.opt_links = [] 
+        for l in links:
+            if l.from_node == gi:
+                self.opt_links.append(l)
+
+                option = self.opts.add()
+                option.checked = False
+
+                if l.to_socket.node.type in ["VECT_MATH", "MATH"]:
+                    option.name = f"{l.from_socket.name} > {l.to_socket.node.name} / {l.to_socket.node.operation.capitalize()} ({l.to_socket.name})"
+                else:
+                    option.name = f"{l.from_socket.name} > {l.to_socket.node.name} ({l.to_socket.name})"
+
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)

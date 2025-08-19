@@ -21,4 +21,5 @@ class GIMenu(bpy.types.Menu):
         pie.operator("object.gifind", text="Find", icon="ZOOM_ALL")
         pie.operator("object.gimerge", text="Merge", icon="LINKED")
         pie.operator("object.gihide", text="Hide", icon="HIDE_ON")
-        pie.operator("object.giusage", text="Usage", icon="HIDE_ON")
+        pie.operator("object.giusage", text="Usage", icon="QUESTION")
+        pie.operator("object.giseparate", text="Separate", icon="SPLIT_VERTICAL")
