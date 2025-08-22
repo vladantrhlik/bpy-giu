@@ -83,10 +83,10 @@ class GIMergeOperator(bpy.types.Operator):
         # calculate new position of first node group
         l = mathutils.Vector((0, 0))
         for n in nodes:
-            l += n.location
+            l += n.location_absolute
 
         l /= len(nodes)
-        nodes[0].location = l
+        nodes[0].location_absolute = l
 
         # remove other node groups
         for n in nodes[1:]:
