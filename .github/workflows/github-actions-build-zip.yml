@@ -1,0 +1,23 @@
+name: GIU .ZIP
+run-name: Building Addon .ZIP
+on: [push]
+jobs:
+  Build-ZIP:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Capture version
+        run: |
+      - name: Create directory with files
+        run: |
+          mkdir GIU
+          cp *.py GIU
+          cp *.toml GIU
+          mkdir tmp
+          mv GIU tmp
+      - name: Create artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: "tmp"
+          name: "GIU"
