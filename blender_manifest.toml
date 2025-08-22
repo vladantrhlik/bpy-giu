@@ -2,10 +2,10 @@ schema_version = "1.0.0"
 
 # Example of manifest file for a Blender extension
 # Change the values according to your extension
-id = "groupinpututils"
+id = "GroupInputUtils"
 version = "1.0.0"
-name = "Groupinpututils"
-tagline = "This is another extension"
+name = "Group Input Utils"
+tagline = "Usefull functions for working with group inputs in Geometry Nodes"
 maintainer = "Vladan Trhlík"
 # Supported types: "add-on", "theme"
 type = "add-on"
@@ -15,7 +15,7 @@ type = "add-on"
 
 # Optional list defined by Blender and server, see:
 # https://docs.blender.org/manual/en/dev/advanced/extensions/tags.html
-tags = ["Animation", "Sequencer"]
+tags = ["Geometry Nodes"]
 
 blender_version_min = "4.2.0"
 # # Optional: Blender version that the extension does not support, earlier versions are supported.

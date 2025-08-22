@@ -213,7 +213,7 @@ class GISeparate(bpy.types.Operator):
 
     @classmethod
     def description(cls, context, properties):
-        return "Separate selected sockets from selected Group Input"
+        return "Separate selected sockets from selected group input."
 
     @classmethod
     def poll(cls, context):
@@ -237,7 +237,10 @@ class GISeparate(bpy.types.Operator):
 
         # create new separated group input
         new_gi = tree.nodes.new('NodeGroupInput')
-        new_gi.location = (gi.location[0], gi.location[1] + 20 + gi.height)
+        new_gi.location_absolute = (gi.location_absolute.x, gi.location_absolute.y - gi.height - 50)
+        # hide all sockets of new group input
+        for s in new_gi.outputs:
+            s.hide = True
 
         # reconnect selected links
         for i, opt in enumerate(self.opts):
@@ -245,11 +248,11 @@ class GISeparate(bpy.types.Operator):
                 original_link = self.opt_links[i]
                 # figure out sockets
                 fr = new_gi.outputs[original_link.from_socket.identifier]
+                fr.hide = False
                 to = original_link.to_socket
                 # create new link and delete old
                 links.remove(original_link)
                 links.new(fr, to)
-                print(f"adding link between {fr} and {to}")
         
         return {'FINISHED'}
 
