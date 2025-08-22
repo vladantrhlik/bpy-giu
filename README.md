@@ -4,7 +4,7 @@
 ## ✨ Why?
 When dealing with large and complicated node trees, it's very important to keep workspace nice and clean. With many parameters group inputs can get VERY large and make it harder to navigate and expand existing node tree. 
 
-This addon adds few useful functions which should speedup working with large group inputs and make our lifes easier.
+This addon adds few useful functions which should speedup working with large group inputs and make our lives easier.
 
 ## ⚡ Installation
 1. **Download the .zip**
@@ -13,7 +13,7 @@ This addon adds few useful functions which should speedup working with large gro
 2. In Blender:  
    `Edit → Preferences → Add-ons → Install from Disk...` → select the `.zip`
 
-## 🎮 Usage
+## ⚙️ Usage
 Once installed, press **`Alt + G`** in the **Geometry Node Editor** to open the **pie menu**.  
 From here, you can access all available functions:
 
